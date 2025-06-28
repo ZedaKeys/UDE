@@ -1,8 +1,8 @@
 #!/bin/bash
-# UDE Performance Module v1.2
+# UDE Performance Module v1.4
 # License: GPLv3
 
-REQUIRED_STEAMOS_VER="3.6"
+REQUIRED_STEAMOS_VER="3.5"  # Minimum for all games
 
 check_steamos_ver() {
   current_ver=$(grep "STEAMOS_VERSION" /etc/os-release | cut -d= -f2)
@@ -12,7 +12,7 @@ check_steamos_ver() {
   fi
 }
 
-# Simulated Controls (Safe for Testing)
+# Simulated Controls
 set_tdp() {
   echo "[UDE] TDP set to $1W"
 }
@@ -32,36 +32,47 @@ load_profile() {
       set_tdp 15
       set_gpu 1600
       toggle_smt on
-      echo "Cyberpunk 2077: 15W TDP, 1600MHz GPU, SMT On"
+      echo "Cyberpunk 2077: 15W TDP, 1600MHz GPU"
       ;;
       
     "oblivion_remastered")
-      check_steamos_ver
       set_tdp 9
       set_gpu 1100
       toggle_smt on
-      echo "Oblivion Remastered (2025):"
-      echo "- 9W TDP, 1100MHz GPU"
-      echo "- Optimized for 60FPS at 1152x720"
-      echo "- FSR Ultra Quality enabled"
+      echo "Oblivion Remastered: 9W TDP, 1100MHz GPU"
+      ;;
+      
+    "baldurs_gate_3")
+      set_tdp 12
+      set_gpu 1300
+      toggle_smt on
+      echo "Baldur's Gate 3 (Patch 8):"
+      echo "- 12W TDP, 1300MHz GPU"
+      echo "- 45FPS w/ FSR Balanced"
       ;;
       
     *)
-      echo "Error: Unknown game profile '$1'"
-      echo "Available profiles: cyberpunk, oblivion_remastered"
+      echo "Error: Unknown game '$1'"
+      echo "Available: cyberpunk, oblivion_remastered, baldurs_gate_3"
+      exit 1
       ;;
   esac
 }
 
 # Main Menu
 echo "--------------------------------------------------"
-echo "Ultimate Deck Experience - Performance Module v1.2"
+echo "Ultimate Deck Experience - Performance Module v1.4"
 echo "--------------------------------------------------"
 echo "Usage: ./performance.sh [game_name]"
-echo "Available games: cyberpunk, oblivion_remastered"
+echo "Available games:"
+echo "- cyberpunk"
+echo "- oblivion_remastered"
+echo "- baldurs_gate_3"
 echo "--------------------------------------------------"
 
-# Execute if argument given
-if [ ! -z "$1" ]; then
-  load_profile "$1"
+if [ -z "$1" ]; then
+  echo "Error: No game specified"
+  exit 1
 fi
+
+load_profile "$1"
