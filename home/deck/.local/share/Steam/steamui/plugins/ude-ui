@@ -1,0 +1,14 @@
+// plugin.js
+const { TDPControl, GameDetection } = require('steam-deck-ui');
+
+class UDEPlugin {
+  static render() {
+    return `
+      <div class="ude-panel">
+        <h3>UDE Control Panel</h3>
+        <button onclick="TDPControl.set(10)">Battery Saver</button>
+        <button onclick="GameDetection.optimize()">Auto-Optimize</button>
+      </div>
+    `;
+  }
+}
