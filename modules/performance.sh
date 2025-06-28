@@ -1,37 +1,36 @@
 #!/bin/bash
-# UDE Performance Module (Safe Test Mode)
+# UDE Performance Module - Cyberpunk 2077 Focused
 
-# Simulated TDP Control - Real function will work on Steam Deck
+# Simulated Controls (Safe for Testing)
 set_tdp() {
-  echo "[UDE] Simulated: TDP set to $1W (real control activates on Steam Deck)"
+  echo "[UDE] Simulated: TDP set to $1W (Steam Deck will use real commands)"
 }
 
-# Profile loader for games
-load_profile() {
-  case "$1" in
-    "elden_ring")
-      set_tdp 12
-      echo "Simulated: GPU 1400MHz, SMT Off"
-      ;;
-    "cyberpunk")
-      set_tdp 15
-      echo "Simulated: GPU 1600MHz, SMT On"
-      ;;
-    *)
-      echo "Error: Game profile '$1' not found. Available profiles: elden_ring, cyberpunk"
-      ;;
-  esac
+set_gpu() {
+  echo "[UDE] Simulated: GPU set to $1MHz"
 }
 
-# Main menu
-echo "--------------------------------------------------"
-echo "Ultimate Deck Experience - Performance Module v0.1"
-echo "--------------------------------------------------"
-echo "Usage: ./performance.sh [game_name]"
-echo "Available games: elden_ring, cyberpunk"
-echo "--------------------------------------------------"
+toggle_smt() {
+  echo "[UDE] Simulated: SMT $1"
+}
 
-# Execute if argument given
-if [ ! -z "$1" ]; then
-  load_profile "$1"
+# Cyberpunk 2077 Profile
+optimize_cyberpunk() {
+  set_tdp 15
+  set_gpu 1600
+  toggle_smt on
+  echo "Cyberpunk 2077 Profile: 15W TDP, 1600MHz GPU, SMT On"
+}
+
+# Main Menu
+echo "-------------------------------------"
+echo "UDE Performance Module - Cyberpunk 2077"
+echo "-------------------------------------"
+echo "Usage: ./performance.sh cyberpunk"
+echo "-------------------------------------"
+
+if [ "$1" = "cyberpunk" ]; then
+  optimize_cyberpunk
+else
+  echo "Error: Use './performance.sh cyberpunk'"
 fi
