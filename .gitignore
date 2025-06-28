@@ -1,0 +1,28 @@
+# === SteamOS/Linux Core ===
+*~
+*.swp
+*.log
+*.tmp
+*.bak
+.DS_Store
+thumbs.db
+
+# === SteamOS Specific ===
+/shadercache/
+/steamapps/common/
+/.steam/root/
+/compatdata/
+*.vdf  # Steam config files
+
+# === Build/IDE ===
+/bin/
+/obj/
+/__pycache__/
+*.pyc
+.vscode/
+.idea/
+
+# === Script Artifacts ===
+/backups/
+/tmp/
+*.tar.gz
