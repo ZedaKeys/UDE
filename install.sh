@@ -1,14 +1,19 @@
 #!/bin/bash
-# UDE Installer (Ultimate Deck Experience)
-# License: GPLv3
+# UDE Full Installation
 
-echo "🎮 UDE Installer - Steam Deck Optimizer"
-echo "✅ Success: Repository is ready for development!"
+echo "Installing Ultimate Deck Experience..."
 
-# Safety checks
-if [ ! -d "$HOME/.config/UDE" ]; then
-  mkdir -p "$HOME/.config/UDE"
-  echo "📁 Created config directory"
-fi
+# 1. Core files
+sudo mkdir -p /etc/ude /usr/local/share/ude
+sudo cp -r modules/* /usr/local/bin/
+sudo cp etc/ude.conf /etc/ude/
 
-echo "🚧 Next steps: Add optimization modules (contact @ZedaKeys)"
+# 2. UI Plugin
+mkdir -p ~/.local/share/Steam/steamui/plugins/ude
+cp steamui/plugins/ude/* ~/.local/share/Steam/steamui/plugins/ude/
+
+# 3. Docs
+mkdir -p ~/Documents/UDE
+cp -r docs/* ~/Documents/UDE/
+
+echo "Success! Restart Steam for UI changes."
