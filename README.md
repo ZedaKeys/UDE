@@ -7,6 +7,9 @@
 ---
 
 ## ✨ Features
+- **🔄 Auto-Game Detection** - Applies profiles when games launch  
+- **📊 Frame-Time Graphs** - Visualize stutters  
+- **🔋 Battery Saver Mode** - Extend playtime by 30%  
 - **AI-Powered Optimization** - Auto-configure settings per game  
 - **Real-Time Monitoring** - FPS, temps, and power usage  
 - **One-Click Profiles** - Battery saver ↔ Performance modes  
