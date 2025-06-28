@@ -29,3 +29,4 @@ curl -sL https://raw.githubusercontent.com/ZedaKeys/UDE/main/install.sh | bash
 |-----------------|-------------------|
 | Elden Ring      | 40FPS/Battery+    |
 | Cyberpunk 2077  | FSR3 Balanced     |
+  
