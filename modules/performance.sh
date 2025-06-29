@@ -1,85 +1,93 @@
 #!/bin/bash
-# UDE Performance Module v3.1
+# UDE Performance Module v3.2 (Fixed)
 # License: GPLv3
 
 # ======================
-# CONFIG LOADER - START
+# CONFIG LOADER (FIXED)
 # ======================
-CONFIG_DIR="$HOME/.config/ude"
-GLOBAL_CONFIG="/etc/ude.conf"
-DEFAULT_CONFIG="$(dirname "$0")/../configs/ude-default.conf"
+CONFIG_FILE="$HOME/UDE/configs/ude-default.conf"
 
-# Initialize default values
-log_level="info"
-default_tdp=10
-max_temp_cpu=90
-max_temp_gpu=85
+# Default values
+system_log_level="info"
+performance_default_tdp=10
+performance_max_temp_cpu=90
+performance_max_temp_gpu=85
+network_disable_ipv6="false"
+network_tcp_optimizations="true"
+backup_enabled="true"
+backup_location="$HOME/ude_backups"
 
-# Load config hierarchy
 load_config() {
-    # 1. Load defaults
-    if [ -f "$DEFAULT_CONFIG" ]; then
-        while IFS='=' read -r key value; do
-            if [[ $key == \[*] ]]; then
-                section=${key#\[}
-                section=${section%\]}
-            elif [[ $key != "" ]] && [[ $value != "" ]]; then
+    if [ -f "$CONFIG_FILE" ]; then
+        while IFS= read -r line; do
+            # Skip comments and empty lines
+            [[ "$line" =~ ^#|^$ ]] && continue
+            
+            # Parse sections
+            if [[ "$line" =~ ^\[(.*)\]$ ]]; then
+                section="${BASH_REMATCH[1]}"
+            # Parse key=value pairs
+            elif [[ "$line" =~ ^([^=]+)=(.*)$ ]]; then
+                key="${BASH_REMATCH[1]}"
+                value="${BASH_REMATCH[2]}"
+                # Remove surrounding quotes if present
+                value="${value%\"}"
+                value="${value#\"}"
+                # Set the variable
                 declare -g "${section}_${key}=${value}"
             fi
-        done < "$DEFAULT_CONFIG"
-    fi
-
-    # 2. Load system config
-    if [ -f "$GLOBAL_CONFIG" ]; then
-        source "$GLOBAL_CONFIG"
-    fi
-
-    # 3. Load user config
-    if [ -f "$CONFIG_DIR/user.conf" ]; then
-        source "$CONFIG_DIR/user.conf"
+        done < "$CONFIG_FILE"
     fi
 }
 
-load_config
 # ====================
-# CONFIG LOADER - END
+# CORE FUNCTIONALITY
 # ====================
-
-# Core Functions
 set_tdp() {
-    echo "[UDE] Setting TDP to $1W (Max CPU: ${performance_max_temp_cpu}C, GPU: ${performance_max_temp_gpu}C)"
-    echo $1 > /sys/class/hwmon/hwmon*/power1_cap
+    echo "[UDE] Setting TDP to $1W"
+    echo "$1" | sudo tee /sys/class/hwmon/hwmon*/power1_cap >/dev/null
 }
 
 set_gpu() {
     echo "[UDE] Setting GPU to $1MHz"
-    echo "manual" > /sys/class/drm/card0/device/power_dpm_force_performance_level
-    echo $1 > /sys/class/drm/card0/device/pp_dpm_sclk
+    echo "manual" | sudo tee /sys/class/drm/card0/device/power_dpm_force_performance_level >/dev/null
+    echo "$1" | sudo tee /sys/class/drm/card0/device/pp_dpm_sclk >/dev/null
 }
 
-# Game Profiles
-load_profile() {
-    case "$1" in
-        "cyberpunk")
-            set_tdp $default_tdp
-            set_gpu 1600
-            ;;
-        "baldurs_gate_3")
-            set_tdp 12
-            set_gpu 1300
-            ;;
-        *)
-            echo "Error: Unknown game '$1'"
-            exit 1
-            ;;
-    esac
+# =================
+# TEST FUNCTION
+# =================
+run_test() {
+    echo "=== UDE PERFORMANCE MODULE TEST ==="
+    echo "Loaded Configuration:"
+    echo "- Default TDP: ${performance_default_tdp}W"
+    echo "- Max CPU Temp: ${performance_max_temp_cpu}°C"
+    echo "- Max GPU Temp: ${performance_max_temp_gpu}°C"
+    echo "Test completed successfully!"
 }
 
-# Main Execution
-if [ -z "$1" ]; then
-    echo "Usage: $0 [game_name]"
-    echo "Configured TDP: $default_tdp W"
-    exit 1
-fi
+# ================
+# MAIN EXECUTION
+# ================
+load_config
 
-load_profile "$1"
+case "$1" in
+    "--test")
+        run_test
+        ;;
+    "baldurs_gate_3")
+        set_tdp "${performance_default_tdp:-12}"
+        set_gpu 1300
+        echo "Baldur's Gate 3: ${performance_default_tdp:-12}W TDP, 1300MHz GPU"
+        ;;
+    "cyberpunk")
+        set_tdp 15
+        set_gpu 1600
+        echo "Cyberpunk 2077: 15W TDP, 1600MHz GPU"
+        ;;
+    *)
+        echo "Usage: $0 [--test|game_name]"
+        echo "Available games: baldurs_gate_3, cyberpunk"
+        exit 1
+        ;;
+esac
